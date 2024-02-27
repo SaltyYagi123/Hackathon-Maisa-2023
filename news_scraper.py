@@ -36,3 +36,8 @@ for source, links in article_links_dict.items():
         print(link)
 
 # * Each source has its own format, but approximately the same 
+# * CNN Completo
+# * Euronews requiere appending, por ejemplo:  https://www.euronews.com/2024/02/27 <- Search by date
+# * BBC: 
+
+# * Form our daily databse, and then maybe some search functionality for additional context: 
