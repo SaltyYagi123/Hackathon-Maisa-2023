@@ -86,4 +86,4 @@ def obtain_articles_from_query(query):
 # * Language specific functions
 # TODO - Barrita de busqueda
 if __name__ == '__main__':
-    obtain_articles_from_query('European Business Updates Last Week')
+   articles_dict = obtain_articles_from_query('European Business Updates Last Week')
