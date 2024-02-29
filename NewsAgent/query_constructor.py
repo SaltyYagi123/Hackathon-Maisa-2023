@@ -8,9 +8,11 @@ from datetime import date
 load_dotenv()
 
 
-def llm_connect(model_name="gpt-3.5-turbo", temperature='0'):
+def llm_connect(model_name="gpt-3.5-turbo", temperature="0"):
     llm = ChatOpenAI(
-        temperature=temperature, model_name=model_name, api_key=os.getenv("OPENAI_API_KEY")
+        temperature=temperature,
+        model_name=model_name,
+        api_key=os.getenv("OPENAI_API_KEY"),
     )
     return llm
 

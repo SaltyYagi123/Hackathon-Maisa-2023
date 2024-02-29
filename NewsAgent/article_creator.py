@@ -1,4 +1,4 @@
-import os 
+import os
 from dotenv import load_dotenv
 from langchain.chains import LLMChain
 from langchain_core.prompts import PromptTemplate
@@ -8,6 +8,7 @@ import concurrent.futures
 
 
 load_dotenv()
+
 
 def extract_facts_prompt(user_query, article):
     template: str = """
@@ -50,46 +51,53 @@ def extract_facts_prompt(user_query, article):
 
     return prompt_template
 
+
 def extract_facts_articles(user_query, article):
     chain = LLMChain(
-        llm = llm_connect(), prompt = extract_facts_prompt(user_query, article)
+        llm=llm_connect(), prompt=extract_facts_prompt(user_query, article)
     )
-    response = chain.invoke(input={'user_query':user_query, 'article':article})
-    return response['text']
+    response = chain.invoke(input={"user_query": user_query, "article": article})
+    return response["text"]
+
 
 def extract_facts_articles_parallel(user_query, article):
     # Assuming extract_facts_articles is I/O bound, it's suitable for ThreadPoolExecutor
-    source_name = article['source']['name']
-    source_url = article['url']
-    bullet_points = extract_facts_articles(user_query, article['text'])
-    return source_name, source_url, article['title'], bullet_points
+    source_name = article["source"]["name"]
+    source_url = article["url"]
+    bullet_points = extract_facts_articles(user_query, article["text"])
+    return source_name, source_url, article["title"], bullet_points
+
 
 def article_bullet_points_parallel(user_query, articles_dict):
     bullet_point_articles = {}
     with concurrent.futures.ThreadPoolExecutor() as executor:
         # Prepare futures for each article extraction
-        futures = [executor.submit(extract_facts_articles_parallel, user_query, article) for article in articles_dict]
+        futures = [
+            executor.submit(extract_facts_articles_parallel, user_query, article)
+            for article in articles_dict
+        ]
         for future in concurrent.futures.as_completed(futures):
             try:
-                #TODO - SOURCE URL CHANGE
-                #TODO - UP THE TEMPERATURE TO 0.2
+                # TODO - SOURCE URL CHANGE
+                # TODO - UP THE TEMPERATURE TO 0.2
                 source_name, source_url, title, bullet_points = future.result()
-                if source_name not in bullet_point_articles: 
-                    bullet_point_articles[source_name] = {
-                        'articles': []
+                if source_name not in bullet_point_articles:
+                    bullet_point_articles[source_name] = {"articles": []}
+
+                bullet_point_articles[source_name]["articles"].append(
+                    {
+                        "article_url": source_url,
+                        "title": title,
+                        "bullet_points": bullet_points,
                     }
-                
-                bullet_point_articles[source_name]['articles'].append({
-                    'article_url': source_url,
-                    'title': title, 
-                    'bullet_points': bullet_points
-                })
+                )
             except Exception as e:
                 print(f"An error occurred: {e}")
 
     return bullet_point_articles
 
-def create_stories_prompt(user_query, bullet_point_articles): 
+
+def create_stories_prompt(user_query, bullet_point_articles):
     template: str = """
     Objective: 
     Act like you are a clear, and expert article journalist in the topics relating to the following query: {user_query}.
@@ -141,32 +149,38 @@ def create_stories_prompt(user_query, bullet_point_articles):
 
     return prompt_template
 
-def generate_article(user_query, bullet_point_dictionary): 
+
+def generate_article(user_query, bullet_point_dictionary):
     chain = LLMChain(
-        llm=llm_connect(model_name='gpt-4-turbo-preview', temperature=0.23), prompt=create_stories_prompt(user_query, bullet_point_dictionary)
+        llm=llm_connect(model_name="gpt-4-turbo-preview", temperature=0.23),
+        prompt=create_stories_prompt(user_query, bullet_point_dictionary),
     )
-    response = chain.invoke(input={"user_query": user_query, "bullet_point_dictionary": bullet_point_dictionary})
+    response = chain.invoke(
+        input={
+            "user_query": user_query,
+            "bullet_point_dictionary": bullet_point_dictionary,
+        }
+    )
     return response["text"]
 
-if __name__ == '__main__':
-    user_query = 'Climate Change'
+def create_article(user_query):
     articles_dict = obtain_articles_from_query(user_query)
     bullet_point_dict = article_bullet_points_parallel(user_query, articles_dict)
     final_article = generate_article(user_query, bullet_point_dict)
-    print(final_article)
+    return final_article
 
-#TODO - LOGO + UI + END-END DEMO + PRESENTACIÓN + PROMPTS + (+1,-1)
-#TODO - ElevenLabs
-#TODO - PRESENTACIÓN: 
+# TODO - LOGO + UI + END-END DEMO + PRESENTACIÓN + PROMPTS + (+1,-1)
+# TODO - ElevenLabs
+# TODO - PRESENTACIÓN:
 # * Questions Part:
-# *     How you could potentially monetise what we’re doing 
-# *     B2C Positioning? 
-# *     Ads? 
-# *     Monetise the podcast -> Free to interact to the agent, by inserting some ads, within the actual loop. 
-# *     Channel 1 - NewsAI - You are the driving force for this - Personalised global news network. 
-# *     Policy + News - Social Impact 
+# *     How you could potentially monetise what we’re doing
+# *     B2C Positioning?
+# *     Ads?
+# *     Monetise the podcast -> Free to interact to the agent, by inserting some ads, within the actual loop.
+# *     Channel 1 - NewsAI - You are the driving force for this - Personalised global news network.
+# *     Policy + News - Social Impact
 # * ——
-# *     What’s the problem (Stats, the problem, the problem, the problem) -> Future-proofing the news. 
-# *     The architecture of the problem -> Maisa 
-# *     More technical oriented -> Tell them the story and the vision. 
-# *     Don’t mention monetisation 
+# *     What’s the problem (Stats, the problem, the problem, the problem) -> Future-proofing the news.
+# *     The architecture of the problem -> Maisa
+# *     More technical oriented -> Tell them the story and the vision.
+# *     Don’t mention monetisation

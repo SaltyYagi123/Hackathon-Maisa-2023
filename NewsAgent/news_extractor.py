@@ -14,7 +14,7 @@ def get_articles(query):
     # TODO - Uncomment for real demo, right now, we want to save on API usage
     search_url = generate_search_url(query)
     complete_url = search_url + f"&apiKey={os.getenv('NEWSAPI_KEY')}"
-    #complete_url = "https://newsapi.org/v2/everything?q=US economy&from=2024-02-23&to=2024-02-29&sortBy=popularity&language=en&pageSize=10&apiKey=6ddc83d9e2974d0fabbac57924805fa3"
+    # complete_url = "https://newsapi.org/v2/everything?q=US economy&from=2024-02-23&to=2024-02-29&sortBy=popularity&language=en&pageSize=10&apiKey=6ddc83d9e2974d0fabbac57924805fa3"
     print(complete_url)
 
     response = requests.get(complete_url)
@@ -47,15 +47,11 @@ def get_maisa_summarize(article):
 
     url = "https://api.maisa.ai/v1/capabilities/summarize"
 
-    payload = {
-        "format": "paragraph",
-        "length": "short",
-        "text": article
-    }
+    payload = {"format": "paragraph", "length": "short", "text": article}
     headers = {
-        "X-API-Key": {os.getenv('MAISA_API_KEY')},
+        "X-API-Key": {os.getenv("MAISA_API_KEY")},
         "accept": "application/json",
-        "content-type": "application/json"
+        "content-type": "application/json",
     }
 
     response = requests.post(url, json=payload, headers=headers)
@@ -66,6 +62,7 @@ def get_maisa_summarize(article):
     summary = summary_dict[list(summary_dict.keys())[0]]
 
     return summary
+
 
 def process_articles_concurrently(articles_dict):
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
