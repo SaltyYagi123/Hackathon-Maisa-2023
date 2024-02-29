@@ -24,17 +24,24 @@ def generate_url_prompt(user_query, today_date):
     - Extract the main topic or keywords from "{user_query}" accurately.
     - If there is a date or time frame mentioned, determine the appropriate time frame for the search. If so, today's date is {today_date}. Otherwise, be sure to leave the fields empty.
     - Use the correct language setting based on the query's language.
-    - For general searches, format the URL as follows:
-    https://newsapi.org/v2/everything?q={{main-topic-or-keyword}}&sortBy=popularity&language={{language-code}}&pageSize=10
-    - For trending or specific topic searches, use this format:
-    https://newsapi.org/v2/top-headlines?q={{main-topic-or-keyword}}&from={{start-date}}&to={{end-date}}&country={{country-code}}&category={{category}}&pageSize=10
+    - For queries without a date, use general searches and format the URL as follows:
+    https://newsapi.org/v2/everything?q={{main-topic-or-keyword}}&category={{category}}&sortBy=popularity&pageSize=10
+    - For queries with a given date or date range, use specific searches and format the URL as follows:
+    https://newsapi.org/v2/top-headlines?q={{main-topic-or-keyword}}&from={{start-date}}&to={{end-date}}&category={{category}}&pageSize=10
 
-    Remember, the placeholders within {{}} should be replaced with information relevant to the search query. Aim for precision in keyword selection to ensure the resulting articles are on-topic.
+    This are the possible categories you can use, if you are not sure for specific queries, pick general as the default category:
+    business - entertainment - general - health - science - sports - technology
 
-    Example task:
-    Given the search query "NVIDIA Stock Jump", construct a URL that fetches the most recent and relevant articles about this topic from NewsAPI.
+    Search Example (Specific Search):
+    Given the query "NVIDIA Stock Jump this week", construct a URL that fetches the most recent and relevant articles about this topic from NewsAPI. Imagine today's date is 2024-02-29.
+    Query output -> https://newsapi.org/v2/top-headlines?q={{US Economy and Stock Market}}&from={{2024-02-23}}&to={{2024-02-29}}&category={{business}}&pageSize=10
 
-    Focus on accuracy and relevancy in your response. Remember, only return the URL generated, don't give any further explanation.
+    Search Example (General Search):
+    Given the query "I want to learn about the climate change" construct a URL that fetches the most recent and relevant articles about this topic from NewsAPI.
+    Query output -> https://newsapi.org/v2/everything?q={{Climate Change}}&category={{science}}&sortBy=popularity&pageSize=10
+
+    Remember, focus on accuracy and relevancy in your response. Remember, only return the URL generated, don't give any further explanation.
+    Also remember, the placeholders within {{}} should be replaced with information relevant to the search query. Aim for precision in keyword selection to ensure the resulting articles are on-topic.
 """
     # Correctly use the named placeholder in the format call
     prompt_template = PromptTemplate(
