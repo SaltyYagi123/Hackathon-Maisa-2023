@@ -1,33 +1,30 @@
 import os
 import requests
-import newspaper
 import pandas as pd
 import concurrent.futures
-
 from newspaper import Article
 from dotenv import load_dotenv
 from query_constructor import generate_search_url
-from newspaper import news_pool
 
 load_dotenv()
 
 
 def get_articles(query):
     # TODO - Uncomment for real demo, right now, we want to save on API usage
-    #search_url = generate_search_url(query)
-    #complete_url = search_url + f"&apiKey={os.getenv('NEWSAPI_KEY')}"
-    complete_url = "https://newsapi.org/v2/everything?q=US economy&from=2024-02-23&to=2024-02-29&sortBy=popularity&language=en&pageSize=10&apiKey=6ddc83d9e2974d0fabbac57924805fa3"
+    search_url = generate_search_url(query)
+    complete_url = search_url + f"&apiKey={os.getenv('NEWSAPI_KEY')}"
+    #complete_url = "https://newsapi.org/v2/everything?q=US economy&from=2024-02-23&to=2024-02-29&sortBy=popularity&language=en&pageSize=10&apiKey=6ddc83d9e2974d0fabbac57924805fa3"
     print(complete_url)
 
     response = requests.get(complete_url)
     if response.status_code == 200:
         articles_json = response.json()
-        for article in articles_json["articles"]:
-            print(f"Title: {article['title']}")
-            print(f"Author: {article['author']}")
-            print(f"Published At: {article['publishedAt']}")
-            print(f"Source: {article['source']['name']}")
-            print(f"URL: {article['url']}\n\n")
+        # * for article in articles_json["articles"]:
+        # * print(f"Title: {article['title']}")
+        # * print(f"Author: {article['author']}")
+        # * print(f"Published At: {article['publishedAt']}")
+        # * print(f"Source: {article['source']['name']}")
+        # * print(f"URL: {article['url']}\n\n")
         return articles_json["articles"]
     else:
         return None
@@ -43,6 +40,7 @@ def extract_article_data(url):
     except Exception as e:
         print(f"Error processing {url}: {e}")
         return None
+
 
 def process_articles_concurrently(articles_dict):
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
@@ -61,6 +59,7 @@ def process_articles_concurrently(articles_dict):
                     article["top_image"] = data["top_image"]
             except Exception as exc:
                 print(f"Article at {article['url']} generated an exception: {exc}")
+
 
 def dictionary_to_csv(articles_dict):
     folder_path = "./searches"
@@ -85,5 +84,5 @@ def obtain_articles_from_query(query):
 # * Llamada a WikiPedia para cosas generales
 # * Language specific functions
 # TODO - Barrita de busqueda
-if __name__ == '__main__':
-   articles_dict = obtain_articles_from_query('European Business Updates Last Week')
+if __name__ == "__main__":
+    articles_dict = obtain_articles_from_query("European Business Updates Last Week")

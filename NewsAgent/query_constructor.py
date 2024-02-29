@@ -7,15 +7,15 @@ from datetime import date
 
 load_dotenv()
 
-def llm_connect(model_name="gpt-3.5-turbo"):
+
+def llm_connect(model_name="gpt-3.5-turbo", temperature='0'):
     llm = ChatOpenAI(
-        temperature=0, model_name=model_name, api_key=os.getenv("OPENAI_API_KEY")
+        temperature=temperature, model_name=model_name, api_key=os.getenv("OPENAI_API_KEY")
     )
     return llm
 
+
 def generate_url_prompt(user_query, today_date):
-    # TODO - Arreglar lo de las fechas, que no se cogen bien. En los ejemplos no solo ponerle 1, si no 2 o 3. 
-    # TODO - Incluirle como pensamos sobre la construcción de la URL (Ejemplos)
     template: str = """
     Your task is to generate a URL for NewsAPI that directly corresponds to {user_query}. 
     Focus on identifying the most relevant keywords or phrases from the query "{user_query}" to ensure the URL will fetch articles closely related to the topic.
@@ -25,9 +25,9 @@ def generate_url_prompt(user_query, today_date):
     - If there is a date or time frame mentioned, determine the appropriate time frame for the search. If so, today's date is {today_date}. Otherwise, be sure to leave the fields empty.
     - Use the correct language setting based on the query's language.
     - For queries without a date, use general searches and format the URL as follows:
-    https://newsapi.org/v2/everything?q={{main-topic-or-keyword}}&category={{category}}&sortBy=popularity&pageSize=10
+        https://newsapi.org/v2/everything?q={{main-topic-or-keyword}}&pageSize=10
     - For queries with a given date or date range, use specific searches and format the URL as follows:
-    https://newsapi.org/v2/top-headlines?q={{main-topic-or-keyword}}&from={{start-date}}&to={{end-date}}&category={{category}}&pageSize=10
+        https://newsapi.org/v2/top-headlines?q={{main-topic-or-keyword}}&from={{start-date}}&to={{end-date}}&category={{category}}&pageSize=10
 
     This are the possible categories you can use, if you are not sure for specific queries, pick general as the default category:
     business - entertainment - general - health - science - sports - technology
@@ -38,7 +38,7 @@ def generate_url_prompt(user_query, today_date):
 
     Search Example (General Search):
     Given the query "I want to learn about the climate change" construct a URL that fetches the most recent and relevant articles about this topic from NewsAPI.
-    Query output -> https://newsapi.org/v2/everything?q={{Climate Change}}&category={{science}}&sortBy=popularity&pageSize=10
+    Query output -> https://newsapi.org/v2/everything?q={{Climate Change}}&pageSize=10
 
     Remember, focus on accuracy and relevancy in your response. Remember, only return the URL generated, don't give any further explanation.
     Also remember, the placeholders within {{}} should be replaced with information relevant to the search query. Aim for precision in keyword selection to ensure the resulting articles are on-topic.
