@@ -50,17 +50,17 @@ def extract_facts_prompt(query, article):
 
     return prompt_template
 
-def extract_facts_articles(article,user_query):
+def extract_facts_articles(user_query, article):
     chain = LLMChain(
-        llm = llm_connect(), prompt = extract_facts_prompt(article)
+        llm = llm_connect(), prompt = extract_facts_prompt(user_query, article)
     )
     response = chain.invoke(input={'user_query':user_query, 'article':article})
     return response['text']
 
-def articles_bullet_point_dictionary(articles_dict, user_query):
+def articles_bullet_point_dictionary(user_query, articles_dict):
     bullet_point_articles = {}
     for article in articles_dict: 
-        source_name = article['publisher']
+        source_name = article['source']
         source_url = article['url']
         bullet_points = extract_facts_articles(article['text'], user_query)
         print(bullet_points)
@@ -85,16 +85,10 @@ def chain_of_thought():
     
     pass
 
-def extract_stories(query):
-    articles_dict = obtain_articles_from_query(query)
-    print(len(articles_dict))
-    for article in articles_dict:
-        print(f"ARTICLE: {article['title']}\n=====================\n")
-        print(article['text'])
-
 if __name__ == '__main__':
     query = 'US Economy this week'
-    articles_dict = extract_stories(query)
+    articles_dict = obtain_articles_from_query(query)
+    print(articles_dict)
     articles_bullet_point_dictionary(articles_dict, query)
 
 #TODO - LOGO + UI + END-END DEMO + PRESENTACIÓN + PROMPTS + (+1,-1)
