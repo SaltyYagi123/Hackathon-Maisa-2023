@@ -11,9 +11,9 @@ load_dotenv()
 
 # * For each article, generate a bullet point summary of the most impactful facts and quotes (if relevant) mentioned
 # * Group per source
-def extract_facts_prompt(query, article):
+def extract_facts_prompt(user_query, article):
     template: str = """
-        Objective: Extract relevant, unbiased, and factual bullet points from a news article related to the user's search query: {query}. 
+        Objective: Extract relevant, unbiased, and factual bullet points from a news article related to the user's search query: {user_query}. 
         Include significant quotes if relevant.
 
         Instructions to deconstruct the article into bullet points: 
@@ -30,7 +30,7 @@ def extract_facts_prompt(query, article):
             *Avoid subjective opinions or biased language unless it's a direct quote that adds value to the factual reporting.
         4. Extract Bullet Points:
             * Create bullet points that succinctly summarize the key facts and findings. Each bullet point should stand alone in conveying a complete piece of information.
-            * If a direct quote is particularly relevant, include it as one of the bullet points, clearly indicating it's a quote with quotation marks and attributing it to the speaker.
+            * If a direct quote is particularly relevant, include it as one of the bullet points, clearly indicating it's a quote with quotation marks and attributing it to the speaker. Furthermore, define if possible who the speaker is.
         5. Maintain Unbiased Reporting:
             * Ensure that each bullet point is presented in a neutral tone, avoiding any language that suggests opinion or bias.
             * Focus on reporting what is known and verified, distinguishing between facts and assertions made within the article.
@@ -39,13 +39,14 @@ def extract_facts_prompt(query, article):
             * Refine the language for clarity and conciseness, ensuring that the bullet points are easily understandable.
         
         Remember the objective of extracting relevant bullet points using the instructions above.
+        These bullet points should be created in such a way that you can reconstruct the story in later prompts. 
         Be sure to only reply with the extracted bullet points and quotes.
         ---
         News article to analyse: {article}
     """
 
     prompt_template = PromptTemplate(
-        template=template, input_variables=["query", "article"]
+        template=template, input_variables=["user_query", "article"]
     )
 
     return prompt_template
@@ -60,17 +61,16 @@ def extract_facts_articles(user_query, article):
 def articles_bullet_point_dictionary(user_query, articles_dict):
     bullet_point_articles = {}
     for article in articles_dict: 
-        source_name = article['source']
+        source_name = article['source']['name']
         source_url = article['url']
         bullet_points = extract_facts_articles(article['text'], user_query)
         print(bullet_points)
-
         if source_name not in bullet_point_articles: 
             bullet_point_articles[source_name] = {
                 'source_url': source_url, 
                 'articles': []
             }
-        
+    
         bullet_point_articles[source_name]['articles'].append({
             'title': article['title'], 
             'bullet_points': bullet_points
@@ -86,10 +86,9 @@ def chain_of_thought():
     pass
 
 if __name__ == '__main__':
-    query = 'US Economy this week'
-    articles_dict = obtain_articles_from_query(query)
-    print(articles_dict)
-    articles_bullet_point_dictionary(articles_dict, query)
+    user_query = 'US Economy this week'
+    articles_dict = obtain_articles_from_query(user_query)
+    articles_bullet_point_dictionary(user_query, articles_dict)
 
 #TODO - LOGO + UI + END-END DEMO + PRESENTACIÓN + PROMPTS + (+1,-1)
 #TODO - ElevenLabs
