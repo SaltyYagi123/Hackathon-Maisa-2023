@@ -1,4 +1,5 @@
 import os
+import ast
 import requests
 import newspaper
 import pandas as pd
@@ -43,6 +44,31 @@ def extract_article_data(url):
     except Exception as e:
         print(f"Error processing {url}: {e}")
         return None
+
+
+def get_maisa_summarize(article):
+
+    url = "https://api.maisa.ai/v1/capabilities/summarize"
+
+    payload = {
+        "format": "paragraph",
+        "length": "short",
+        "text": article
+    }
+    headers = {
+        "X-API-Key": {os.getenv('MAISA_API_KEY')},
+        "accept": "application/json",
+        "content-type": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    summarize = response.text
+
+    summary_dict = ast.literal_eval(summarize)
+    summary = summary_dict[list(summary_dict.keys())[0]]
+
+    return summary
 
 def process_articles_concurrently(articles_dict):
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
