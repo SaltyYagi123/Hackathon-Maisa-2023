@@ -1,4 +1,5 @@
 # Django #
+!Django/blog-simple-con-django4.1
 *.log
 *.pot
 *.pyc
