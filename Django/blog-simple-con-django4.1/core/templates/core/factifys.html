@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <h2>Noticias 2</h2>
+      <hr>
+      {% for factify in factifys %}
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">{{ factify.title }}</h5>
+          <a href= {{factify.url}} class="card-text">Sources</a>
+          <hr>
+          <a href="{% url 'detalle_factify' factify.id %}" class="btn btn-primary" style="align-self: middle;">More info</a>
+        </div>
+      </div>
+      {% empty %}
+      <p>There is no news.</p>
+      {% endfor %}
+    </div>
+    <div class="col-md-4">
+      <!-- Aquí puedes agregar cualquier contenido adicional, como widgets, publicidad, etc. -->
+    </div>
+  </div>
+</div>
+
+{% endblock %}

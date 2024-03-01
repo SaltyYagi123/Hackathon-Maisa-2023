@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <hr>
+      <p>{{ factify.image }}</p>
+      <hr>
+      <h2>{{ factify.title }}</h2>
+      <hr>
+      <p>{{ factify.author }}</p>
+      <hr>
+      <p>{{ factify.publishedAt }}</p>
+      <hr>
+      <p>{{ factify.source }}</p>
+      <hr>
+      <p>{{ factify.resume }}</p>
+    </div>
+    <div class="col-md-4">
+      <!-- Puedes agregar contenido adicional aquí si lo deseas -->
+    </div>
+  </div>
+</div>
+
+{% endblock %}

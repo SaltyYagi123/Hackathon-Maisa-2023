@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <h2>Noticias 2</h2>
+      <hr>
+      {% for noticia2 in noticias2 %}
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">{{ noticia2.title }}</h5>
+          <p class="card-text">{{ noticia2.resume }}</p>
+          <a href="{% url 'detalle_noticia2' noticia2.id %}" class="btn btn-primary">Leer más</a>
+        </div>
+      </div>
+      {% empty %}
+      <p>No hay noticias disponibles.</p>
+      {% endfor %}
+    </div>
+    <div class="col-md-4">
+      <!-- Aquí puedes agregar cualquier contenido adicional, como widgets, publicidad, etc. -->
+    </div>
+  </div>
+</div>
+
+{% endblock %}
